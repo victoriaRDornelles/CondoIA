@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CondoIA — Gestão inteligente de condomínios</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<link rel="stylesheet" href="/static/css/condoia.css">
+</head>
+<body>
+<div id="loginOverlay" class="login-overlay" style="display:none"><div class="login-photo"><img src="/static/img/condominio.jpg" alt="Condomínio"><div class="login-copy"><div class="brand">Condo<span>IA</span></div><h1>Gestão inteligente para o seu condomínio.</h1><p>Uma plataforma centralizada para Administração, Ronda e Manutenção.</p></div></div><div class="login-panel"><div class="login-card"><div class="brand">Condo<span>IA</span></div><h2>Bem-vindo!</h2><p class="login-sub">Acesse sua conta para continuar.</p><label class="login-label" for="loginUser">Usuário ou e-mail</label><input id="loginUser" class="login-input" placeholder="Digite seu usuário ou e-mail" autocomplete="username" autocapitalize="none" onkeydown="if(event.key==='Enter')login()"><label class="login-label" for="loginPass">Senha</label><div class="login-pass"><input id="loginPass" class="login-input" type="password" placeholder="Digite sua senha" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"><button type="button" onclick="togglePass()" aria-label="Mostrar ou ocultar senha">◉</button></div><div class="login-row"><label><input type="checkbox" id="loginRemember"> Lembrar-me</label><button class="login-forgot" onclick="forgotPassword()">Esqueci minha senha</button></div><button class="login-btn" id="loginBtn" onclick="login()">Entrar</button><div id="loginError" class="login-error" style="display:none"></div><div class="login-foot">CondoIA · Gestão inteligente de condomínios</div></div></div></div>
+<div id="app" class="app" style="display:none">
+<aside class="sidebar">
+  <div class="logo"><strong>Condo<span>IA</span></strong><small>Gestão inteligente</small></div>
+  <div class="condo"><b id="condoName">Condomínio</b><span id="condoInfo"></span></div>
+  <nav class="nav" id="nav"></nav>
+  <div class="user"><div class="avatar" id="avatar"></div><div class="clickable" onclick="openSenhaForm()" title="Alterar minha senha"><b id="userName"></b><small id="userRole"></small></div><button class="logout" onclick="logout()" title="Sair" aria-label="Sair">↪</button></div>
+</aside>
+
+<main class="main">
+<header class="top">
+  <h1 id="pageTitle">Dashboard</h1>
+  <div class="top-actions"><button class="btn" id="topBell" onclick="bellClick()" title="Pendências">🔔 <span id="bellCount">0</span></button><button class="btn" id="topSearch" onclick="searchClick()" title="Buscar">⌕</button><button class="btn primary" id="topOS" onclick="startOS()">＋ Nova OS</button></div>
+</header>
+
+<section class="content">
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="page">
+  <div id="dashAlerts"></div>
+  <div class="metrics">
+    <div class="metric"><div class="number" id="mUnidades">–</div><p>Unidades</p><span class="badge ok" id="mUnidadesB">–</span></div>
+    <div class="metric"><div class="number" id="mOsAbertas">–</div><p>OS abertas</p><span class="badge danger" id="mOsAbertasB">–</span></div>
+    <div class="metric"><div class="number" id="mOsAndamento">–</div><p>OS em andamento</p><span class="badge warn" id="mOsAndamentoB">em execução</span></div>
+    <div class="metric"><div class="number" id="mOsConcluidas">–</div><p>OS concluídas no mês</p><span class="badge ok">este mês</span></div>
+    <div class="metric"><div class="number" id="mRondas">–</div><p>Rondas este mês</p><span class="badge ok" id="mRondasB">–</span></div>
+    <div class="metric"><div class="number" id="mRondasPend">–</div><p>Rondas em andamento</p><span class="badge info" id="mRondasPendB">–</span></div>
+    <div class="metric"><div class="number" id="mBlocos">–</div><p>Blocos verificados hoje</p><span class="badge info" id="mBlocosB">–</span></div>
+    <div class="metric"><div class="number" id="mEmpresas">–</div><p>Empresas terceirizadas ativas</p><span class="badge info">cadastradas</span></div>
+    <div class="metric"><div class="number" id="mDocs">–</div><p>Documentos a vencer</p><span class="badge warn" id="mDocsB">–</span></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><div class="card-head"><h2>Ordens de serviço recentes</h2><button class="link link-btn" onclick="go('oslista')">Ver todas</button></div>
+      <div class="list" id="dashOS"></div>
+    </div>
+    <div class="card"><div class="card-head"><h2>Última ronda</h2><button class="link link-btn" id="dashRondaLink" onclick="go('rondahist')">Detalhes</button></div>
+      <div class="list" id="dashRonda"></div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card"><div class="card-head"><h2>Ocorrências recentes</h2><button class="link link-btn" onclick="go('ocorrencias')">Ver todas</button></div>
+      <div class="list" id="dashOc"></div>
+    </div>
+    <div class="card"><div class="card-head"><h2>Documentos próximos do vencimento</h2><button class="link link-btn" onclick="go('documentos')">Ver todos</button></div>
+      <div class="list" id="dashDocs"></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-head"><h2>Ações rápidas</h2></div>
+    <div class="quick">
+      <button onclick="startOS()">🛠️ Abrir nova Ordem de Serviço</button>
+      <button onclick="go('rondahist')">✓ Acompanhar rondas</button>
+      <button onclick="go('ia')">🤖 Perguntar ao CondoIA</button>
+    </div>
+  </div>
+</div>
+
+<!-- OS WIZARD -->
+<div id="os" class="page">
+  <div class="wizard-shell">
+    <div class="wizard-head">
+      <div class="brand">CondoIA · Nova Ordem de Serviço</div>
+      <small>Registro rápido, simples e eficiente para a equipe do condomínio.</small>
+      <div class="steps" id="stepBars"></div>
+    </div>
+    <div class="wizard">
+      <div class="step-page active" data-step="1">
+        <h2 class="step-title">Onde está o problema?</h2><p class="step-sub">Escolha o local para continuar.</p>
+        <div class="options">
+          <button class="option" onclick="selectOption(this,'local','Portaria Norte')"><span class="symbol">🏢</span><div><b>Portaria Norte</b><small>Entrada principal</small></div></button>
+          <button class="option" onclick="selectOption(this,'local','Portaria Sul')"><span class="symbol">🏢</span><div><b>Portaria Sul</b></div></button>
+          <button class="option" onclick="selectOption(this,'local','Garagem')"><span class="symbol">🚗</span><div><b>Garagem</b></div></button>
+          <button class="option" onclick="selectOption(this,'local','Área de lazer')"><span class="symbol">🏊</span><div><b>Área de lazer</b></div></button>
+          <button class="option" onclick="selectOption(this,'local','Casa de máquinas')"><span class="symbol">⚙</span><div><b>Casa de máquinas</b></div></button>
+          <button class="option" onclick="selectOption(this,'local','Áreas técnicas')"><span class="symbol">🔧</span><div><b>Áreas técnicas</b></div></button>
+        </div>
+      </div>
+
+      <div class="step-page" data-step="2">
+        <h2 class="step-title">Qual equipamento?</h2><p class="step-sub">Selecione o equipamento relacionado ao problema.</p>
+        <div class="options">
+          <button class="option" onclick="selectOption(this,'equipamento','Portão de entrada')"><span class="symbol">🚪</span><b>Portão de entrada</b></button>
+          <button class="option" onclick="selectOption(this,'equipamento','Portão de saída')"><span class="symbol">🚪</span><b>Portão de saída</b></button>
+          <button class="option" onclick="selectOption(this,'equipamento','Cancela de veículos')"><span class="symbol">🚧</span><b>Cancela de veículos</b></button>
+          <button class="option" onclick="selectOption(this,'equipamento','Interfone')"><span class="symbol">☎</span><b>Interfone</b></button>
+          <button class="option" onclick="selectOption(this,'equipamento','CFTV — Câmeras')"><span class="symbol">📹</span><b>CFTV — Câmeras</b></button>
+          <button class="option" onclick="selectOption(this,'equipamento','Iluminação')"><span class="symbol">💡</span><b>Iluminação</b></button>
+        </div>
+      </div>
+
+      <div class="step-page" data-step="3">
+        <h2 class="step-title">Qual é o problema?</h2><p class="step-sub">Descreva o que aconteceu.</p>
+        <label style="font-size:12px;font-weight:700;display:block;margin-bottom:7px" for="category">Categoria</label>
+        <select class="field" id="category"><option>Portões</option><option>Elétrica</option><option>Hidráulica</option><option>Iluminação</option><option>CFTV</option><option>Jardinagem</option><option>Limpeza</option><option>Civil</option><option>Outros</option></select>
+        <label style="font-size:12px;font-weight:700;display:block;margin:16px 0 7px" for="description">Qual o problema?</label>
+        <textarea id="description" rows="6" maxlength="2000" placeholder="Ex.: Portão apresentando ruído e travando durante o fechamento."></textarea>
+      </div>
+
+      <div class="step-page" data-step="4">
+        <h2 class="step-title">Registre uma foto</h2><p class="step-sub">A foto do problema é obrigatória para abrir a OS.</p>
+        <div id="osPhotos"></div>
+      </div>
+
+      <div class="step-page" data-step="5">
+        <h2 class="step-title">Qual a prioridade?</h2><p class="step-sub">Selecione a gravidade da situação.</p>
+        <div class="priority">
+          <button class="option" onclick="selectOption(this,'prioridade','Crítica')"><b style="color:var(--red)">🔴 Crítica</b><small>Risco à segurança, operação comprometida ou parada total.</small></button>
+          <button class="option" onclick="selectOption(this,'prioridade','Alta')"><b style="color:var(--orange)">🟠 Alta</b><small>Afeta a operação, mas há alternativa de uso.</small></button>
+          <button class="option" onclick="selectOption(this,'prioridade','Média')"><b style="color:#c78b00">🟡 Média</b><small>Incômodo ou funcionamento parcial.</small></button>
+          <button class="option" onclick="selectOption(this,'prioridade','Baixa')"><b style="color:var(--green)">🟢 Baixa</b><small>Melhoria ou ajuste sem impacto imediato.</small></button>
+        </div>
+      </div>
+
+      <div class="step-page" data-step="6">
+        <h2 class="step-title">Confira as informações</h2><p class="step-sub">Revise os dados antes de abrir a OS.</p>
+        <div class="review" id="review"></div>
+      </div>
+
+      <div class="step-page" data-step="7">
+        <div class="success">
+          <div class="check">✓</div><h2 class="step-title">OS aberta com sucesso!</h2><p class="step-sub">A solicitação foi encaminhada para atendimento.</p>
+          <div class="osnum">Número da OS<strong id="osNumber"></strong></div>
+          <div class="review" id="successReview"></div>
+        </div>
+      </div>
+
+      <div class="wizard-actions">
+        <button class="btn" id="backBtn" onclick="prevStep()">← Voltar</button>
+        <div class="right">
+          <button class="btn primary" id="nextBtn" onclick="nextStep()">Continuar →</button>
+          <button class="btn" id="viewOSBtn" style="display:none" onclick="openCreatedOS()">Ver OS</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LISTA DE OS (Administração) -->
+<div id="oslista" class="page">
+ <div class="card">
+  <div class="card-head"><h2>🛠️ Ordens de Serviço</h2><button class="btn primary" onclick="startOS()">＋ Nova OS</button></div>
+  <div class="toolbar"><input id="osBusca" placeholder="🔎 Buscar por número, local ou problema..." oninput="debounce('os',loadOSList)"><select id="osStatus" onchange="loadOSList()"><option value="">Todos os status</option><option value="aberta">Aberta</option><option value="em_andamento">Em andamento</option><option value="concluida">Concluída</option></select></div>
+  <div class="table-wrap"><table class="table"><thead><tr><th>OS</th><th>QUAL O PROBLEMA?</th><th>LOCAL</th><th>PRIORIDADE</th><th>RESPONSÁVEL</th><th>STATUS</th><th>ABERTA EM</th></tr></thead><tbody id="osListBody"></tbody></table></div>
+ </div>
+</div>
+
+<!-- DETALHE DA OS -->
+<div id="osdetalhe" class="page"><div class="two-col"><div><div class="card" id="osDetMain"></div></div><div><div class="card"><div class="card-head"><h2>Histórico</h2></div><div id="osDetHist"></div></div></div></div></div>
+
+<!-- RONDAS (perfil Ronda) -->
+<div id="rondas" class="page">
+ <div class="card" id="rondaInicio" style="display:none"><div class="card-head"><h2>✓ Ronda operacional</h2></div><p class="note">Nenhuma ronda em andamento. Ao iniciar, o sistema registra seu usuário, a data e o horário de início.</p><div id="rondaQrAviso"></div><button class="btn primary big-btn" onclick="startRonda()">✓ Iniciar ronda</button></div>
+ <div class="two-col" id="rondaAtiva" style="display:none"><div><div class="card"><div class="card-head"><h2>✓ Ronda operacional</h2><span class="badge warn" id="roundProgress">0 de 12</span></div><p class="note" id="rondaInfo"></p><p class="note">Nos blocos, <b>1 QR Code por bloco</b> identifica o bloco e seus andares são verificados individualmente.</p><button class="btn primary big-btn" style="margin-top:12px" onclick="finishRonda()">Finalizar ronda</button></div><div class="card"><div class="card-head"><h2>🛡️ Guarita Norte</h2></div><div id="northPoints"></div></div><div class="card"><div class="card-head"><h2>🛡️ Guarita Sul</h2><span class="badge info">somente 1 porteiro</span></div><div id="southPoints"></div></div><div class="card"><div class="card-head"><h2>🏖️ Áreas comuns</h2></div><div id="commonPoints"></div></div></div><div><div class="card"><div class="card-head"><h2>🏢 Blocos · QR Codes</h2><span class="badge info" id="blocksProgress"></span></div><button class="btn primary big-btn" style="margin-bottom:14px" onclick="openScanner()">📷 Escanear QR Code do bloco</button><div class="qr-grid" id="qrGrid"></div></div><div class="card" id="blockDetail"><div class="card-head"><h2>Bloco selecionado</h2></div><p class="note">Escaneie um QR Code para iniciar a verificação.</p></div></div></div>
+</div>
+
+<!-- HISTÓRICO DE RONDAS -->
+<div id="rondahist" class="page">
+ <div class="card">
+  <div class="card-head"><h2 id="rondaHistTitle">✓ Rondas</h2></div>
+  <div class="toolbar"><input type="date" id="rhDe" onchange="loadRondaHist()" aria-label="De"><input type="date" id="rhAte" onchange="loadRondaHist()" aria-label="Até"><select id="rhUser" onchange="loadRondaHist()" style="display:none"><option value="">Todos os usuários</option></select></div>
+  <div class="table-wrap"><table class="table"><thead><tr><th>RONDA</th><th>USUÁRIO</th><th>INÍCIO</th><th>TÉRMINO</th><th>REGISTROS</th><th>PROBLEMAS</th><th>STATUS</th></tr></thead><tbody id="rondaHistBody"></tbody></table></div>
+ </div>
+</div>
+<div id="rondadetalhe" class="page"><div id="rondaDetContent"></div></div>
+
+<!-- OCORRENCIAS -->
+<div id="ocorrencias" class="page">
+ <div class="card">
+  <div class="card-head"><h2>Ocorrências</h2><button class="btn primary" id="newOcBtn" onclick="openOcorrenciaForm()">＋ Nova ocorrência</button></div>
+  <div class="toolbar"><input id="ocBusca" placeholder="🔎 Buscar ocorrência..." oninput="debounce('oc',loadOcorrencias)"><select id="ocStatus" onchange="loadOcorrencias()"><option value="">Todos os status</option><option value="aberta">Aberta</option><option value="em_atendimento">Em atendimento</option><option value="concluida">Concluída</option></select></div>
+  <div class="table-wrap"><table class="table"><thead><tr><th>NÚMERO</th><th>DATA</th><th>LOCAL</th><th>DESCRIÇÃO</th><th>REGISTRADA POR</th><th>STATUS</th><th>OS</th></tr></thead>
+  <tbody id="ocBody"></tbody></table></div>
+ </div>
+</div>
+
+<!-- ADMINISTRATIVO / MANUTENCAO -->
+<div id="empresas" class="page"><div class="card"><div class="card-head"><h2>🔧 Empresas Terceirizadas</h2><button class="btn primary" onclick="openEmpresaForm()">＋ Adicionar empresa</button></div><p class="note">Cadastro das empresas terceirizadas que prestam serviços ao condomínio.</p><div class="table-wrap"><table class="table"><thead><tr><th>EMPRESA</th><th>SERVIÇO</th><th>CONTATO</th><th>CONTRATO</th><th>VALIDADE</th><th>STATUS</th></tr></thead><tbody id="empBody"></tbody></table></div></div></div>
+<div id="unidades" class="page"><div class="card"><div class="card-head"><h2>🏢 Unidades</h2><button class="btn primary" onclick="openUnidadeForm()">＋ Adicionar unidade</button></div><p class="note">Consulta das unidades e seus blocos.</p><div class="table-wrap"><table class="table"><thead><tr><th>UNIDADE</th><th>BLOCO</th><th>ANDAR</th><th>STATUS</th><th></th></tr></thead><tbody id="uniBody"></tbody></table></div></div></div>
+<div id="documentos" class="page"><div class="card"><div class="card-head"><h2>📄 Documentos</h2><button class="btn primary" onclick="openDocumentoForm()">＋ Adicionar documento</button></div><p class="note">Contratos, regulamentos, laudos, certificados e documentos administrativos.</p><div class="table-wrap"><table class="table"><thead><tr><th>DOCUMENTO</th><th>CATEGORIA</th><th>RESPONSÁVEL</th><th>VALIDADE</th><th>STATUS</th><th></th></tr></thead><tbody id="docBody"></tbody></table></div></div></div>
+<div id="relatorios" class="page"><div class="card"><div class="card-head"><h2>📈 Relatórios</h2></div><div class="toolbar"><label class="note">De <input type="date" id="relDe" onchange="loadRelatorios()"></label><label class="note">Até <input type="date" id="relAte" onchange="loadRelatorios()"></label></div><div class="metrics" id="relMetrics"></div></div><div class="grid2"><div class="card"><div class="card-head"><h2>OS por categoria</h2></div><div id="relCat"></div></div><div class="card"><div class="card-head"><h2>Ocorrências por local</h2></div><div id="relLocal"></div></div></div><div class="card"><div class="card-head"><h2>Rondas por usuário</h2></div><div id="relRondas"></div></div></div>
+<div id="minhasos" class="page"><div class="card"><div class="card-head"><h2>🛠️ Minhas Ordens de Serviço</h2><span class="badge warn" id="minhasBadge"></span></div><div class="table-wrap"><table class="table"><thead><tr><th>OS</th><th>QUAL O PROBLEMA?</th><th>LOCAL</th><th>PRIORIDADE</th><th>STATUS</th><th>AÇÃO</th></tr></thead><tbody id="minhasBody"></tbody></table></div></div><div class="card"><div class="card-head"><h2>📋 OS disponíveis</h2><span class="badge info" id="dispBadge"></span></div><div class="table-wrap"><table class="table"><thead><tr><th>OS</th><th>QUAL O PROBLEMA?</th><th>LOCAL</th><th>PRIORIDADE</th><th>ABERTA EM</th><th>AÇÃO</th></tr></thead><tbody id="dispBody"></tbody></table></div></div></div>
+<div id="concluiros" class="page"><div class="card" style="max-width:760px;margin:auto"><div class="card-head"><h2 id="closeTitle">Concluir OS</h2><span class="badge warn">Em andamento</span></div><div class="review" id="closeReview"></div><label style="font-size:12px;font-weight:700;display:block;margin:16px 0 7px" for="serviceDone">O que foi feito?</label><textarea id="serviceDone" rows="5" maxlength="3000" placeholder="Descreva o serviço realizado."></textarea><label style="font-size:12px;font-weight:700;display:block;margin:16px 0 7px">Foto depois de feito</label><div id="finalUpload"></div><div class="photo-required">⚠ Foto final obrigatória para concluir a OS.</div><div class="wizard-actions"><button class="btn" onclick="history.back()">← Voltar</button><button class="btn primary" id="finishOSBtn" onclick="finishOS()">✓ Concluir OS</button></div></div></div>
+
+<!-- SISTEMA (Administração) -->
+<div id="blocos" class="page"><div class="card"><div class="card-head"><h2>🏢 Blocos e QR Codes</h2><a class="btn primary" href="/admin/qrcodes/imprimir" target="_blank" rel="noopener">🖨️ Imprimir QR Codes</a></div><p class="note">Cada bloco tem 1 QR Code. Informe quantos andares cada bloco possui: após escanear o QR Code, a ronda verifica cada andar separadamente. Gerar um novo QR Code desativa o anterior.</p><div class="qr-grid" id="adminQrGrid" style="margin-top:14px"></div></div></div>
+<div id="usuarios" class="page"><div class="card"><div class="card-head"><h2>👤 Usuários</h2><button class="btn primary" onclick="openUsuarioForm()">＋ Adicionar usuário</button></div><div class="table-wrap"><table class="table"><thead><tr><th>NOME</th><th>USUÁRIO</th><th>PERFIL</th><th>ÚLTIMO ACESSO</th><th>STATUS</th><th></th></tr></thead><tbody id="usrBody"></tbody></table></div></div></div>
+<div id="auditoria" class="page"><div class="card"><div class="card-head"><h2>🧾 Histórico e auditoria</h2></div><div class="toolbar"><select id="audUser" onchange="loadAuditoria()"><option value="">Todos os usuários</option></select><select id="audAcao" onchange="loadAuditoria()"><option value="">Todas as ações</option><option value="login">Login / logout</option><option value="os_">Ordens de serviço</option><option value="ronda_">Rondas</option><option value="qr_">QR Codes</option><option value="ocorrencia">Ocorrências</option><option value="foto">Fotos</option><option value="usuario">Usuários</option><option value="senha">Senhas</option><option value="acesso">Login e senha (Configurações)</option><option value="documento">Documentos</option><option value="empresa">Empresas</option><option value="config">Configurações</option><option value="bloco">Blocos</option></select><input type="date" id="audDe" onchange="loadAuditoria()" aria-label="De"><input type="date" id="audAte" onchange="loadAuditoria()" aria-label="Até"></div><div class="table-wrap"><table class="table"><thead><tr><th>DATA/HORA</th><th>USUÁRIO</th><th>AÇÃO</th><th>REGISTRO</th><th>DETALHE</th></tr></thead><tbody id="audBody"></tbody></table></div></div></div>
+<div id="configuracoes" class="page"><div class="card" style="max-width:760px"><div class="card-head"><h2>⚙️ Configurações</h2></div><div class="form-grid" id="cfgForm"></div><div class="wizard-actions"><span></span><button class="btn primary" onclick="saveConfig()">Salvar configurações</button></div></div><div class="card" style="max-width:760px"><div class="card-head"><h2>🔑 Login e senha dos usuários</h2><span class="badge info">opcional</span></div><p class="note">Altere o login ou a senha de qualquer usuário quando precisar. Deixe em branco o que não quiser mudar. O usuário alterado é desconectado e passa a entrar com os novos dados.</p><div class="table-wrap" style="margin-top:12px"><table class="table"><thead><tr><th>NOME</th><th>LOGIN ATUAL</th><th>PERFIL</th><th></th></tr></thead><tbody id="acessoBody"></tbody></table></div></div><div class="card" style="max-width:760px"><div class="card-head"><h2>Minha senha</h2></div><button class="btn" onclick="openSenhaForm()">Alterar minha senha</button></div></div>
+
+<!-- IA -->
+<div id="ia" class="page">
+ <div class="chat">
+  <div class="messages" id="messages">
+   <div class="msg bot"><b>🤖 CondoIA</b><br>Olá! Posso consultar informações reais do sistema sobre ordens de serviço, rondas, ocorrências e documentos.</div>
+  </div>
+  <div class="chatbox"><input id="chatInput" maxlength="500" placeholder="Pergunte sobre OS, rondas, ocorrências..." onkeydown="if(event.key==='Enter')sendChat()"><button class="btn primary" onclick="sendChat()">Enviar</button></div>
+ </div>
+</div>
+
+</section>
+</main>
+</div>
+
+<div id="modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal()"><div class="card modal-card" role="dialog" aria-modal="true"><div class="card-head"><h2 id="modalTitle"></h2><button class="btn" onclick="closeModal()" aria-label="Fechar">✕</button></div><div id="modalBody"></div></div></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="/static/js/core.js"></script>
+<script src="/static/js/os.js"></script>
+<script src="/static/js/ronda.js"></script>
+<script src="/static/js/admin.js"></script>
+</body>
+</html>
