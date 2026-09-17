@@ -52,6 +52,11 @@ def create_app(config=None):
     os.makedirs(os.path.dirname(app.config["DATABASE"]), exist_ok=True)
     os.makedirs(app.config["UPLOAD_DIR"], exist_ok=True)
 
+    database.inicializar(
+        app.config["DATABASE"],
+        os.environ.get("CONDOIA_DEMO_PASSWORD")
+    )
+
     app.teardown_appcontext(fechar_db)
     registrar_hooks(app)
     registrar_rotas(app)
