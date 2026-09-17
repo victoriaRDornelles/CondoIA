@@ -100,7 +100,7 @@ def inicializar(caminho, senha_padrao=None):
     for nome, usuario, perfil in USUARIOS_INICIAIS:
         if con.execute("SELECT 1 FROM users WHERE usuario=?", (usuario,)).fetchone():
             continue
-        senha = senha_padrao or secrets.token_urlsafe(8)
+        senha = senha_padrao or os.environ.get("CONDOIA_DEMO_PASSWORD") or secrets.token_urlsafe(8)
         role_id = con.execute("SELECT id FROM roles WHERE codigo=?", (perfil,)).fetchone()[0]
         con.execute(
             "INSERT INTO users (nome, usuario, senha_hash, role_id, ativo, criado_em) VALUES (?,?,?,?,1,?)",
